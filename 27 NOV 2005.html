@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Birthday Surprise – Anita Novitasari</title>
+
+<style>
+    body {
+        background: #1a001a;
+        color: #ff9ad1;
+        font-family: "Courier New", monospace;
+        padding: 20px;
+        overflow-x: hidden;
+    }
+
+    .terminal-box {
+        border: 2px solid #ff9ad1;
+        padding: 20px;
+        width: 85%;
+        margin: 40px auto;
+        border-radius: 10px;
+        box-shadow: 0 0 14px #ff7cc6;
+        min-height: 400px;
+    }
+
+    button {
+        background: #1a001a;
+        color: #ffb3dd;
+        border: 2px solid #ff9ad1;
+        padding: 10px 25px;
+        cursor: pointer;
+        font-size: 17px;
+        transition: 0.3s;
+        font-family: "Courier New", monospace;
+        margin-top: 25px;
+        border-radius: 6px;
+    }
+
+    button:hover {
+        background: #ff9ad1;
+        color: #1a001a;
+        font-weight: bold;
+        box-shadow: 0 0 10px #ff77c6;
+    }
+
+    .hidden { display: none; }
+
+    .cake {
+        font-size: 85px;
+        text-align: center;
+        animation: float 1.7s infinite ease-in-out;
+        margin-top: 10px;
+    }
+
+    @keyframes float {
+        0% { transform: translateY(0); }
+        50% { transform: translateY(-15px); }
+        100% { transform: translateY(0); }
+    }
+
+    .typing {
+        white-space: pre-wrap;
+        border-right: 2px solid #ff9ad1;
+        animation: caret 0.8s infinite;
+        padding-top: 10px;
+    }
+
+    @keyframes caret {
+        50% { border-color: transparent; }
+    }
+
+    .ig-frame {
+        width: 260px;
+        border-radius: 18px;
+        padding: 10px;
+        background: #2a002a;
+        border: 2px solid #ff9ad1;
+        box-shadow: 0 0 18px #ff77c6;
+    }
+
+    .ig-frame img {
+        width: 100%;
+        border-radius: 12px;
+    }
+
+    .page-wrapper {
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+        gap: 45px;
+        margin-top: 20px;
+    }
+
+    .page-text { max-width: 450px; }
+
+    /* CONFETTI */
+    .confetti {
+        position: fixed;
+        top: -10px;
+        width: 10px;
+        height: 10px;
+        background: #ff77c6;
+        animation: fall linear forwards;
+        opacity: 0.9;
+        border-radius: 50%;
+        z-index: 9999;
+    }
+
+    @keyframes fall {
+        to {
+            transform: translateY(110vh) rotate(720deg);
+            opacity: 0;
+        }
+    }
+
+    /* COUNTDOWN */
+    #countdownBox {
+        font-size: 55px;
+        text-align: center;
+        margin-top: 40px;
+        color: #ffb3dd;
+        text-shadow: 0 0 12px #ff77c6;
+    }
+</style>
+</head>
+
+<body>
+
+<audio id="music" src="Birthday Girl.mp3"></audio>
+
+<div class="terminal-box" id="screen">
+
+    <!-- PAGE 1 -->
+    <div id="page1">
+        <div class="typing" id="t1">
+System Booting...
+Loading Birthday Surprise Pink Edition...
+
+Nama kamu Anita Novita Sari?
+        </div>
+        <button onclick="toPage2()">Ya, itu aku</button>
+    </div>
+
+    <!-- PAGE 2 -->
+    <div id="page2" class="hidden">
+        <div class="typing">Apakah kamu siap menjelajahi layar ini?</div>
+        <button onclick="startCountdown()">Siap dong ➜</button>
+    </div>
+
+    <!-- COUNTDOWN -->
+    <div id="countdownPage" class="hidden">
+        <div class="typing">Preparing surprise...</div>
+        <div id="countdownBox">3</div>
+    </div>
+
+    <!-- PAGE 3 (CAKE) -->
+    <div id="page3" class="hidden">
+        <div class="cake">🎂</div>
+        <div class="typing" id="wish"></div>
+        <button onclick="toPage4()">Lanjut ➜</button>
+    </div>
+
+    <!-- PAGE 4 (FOTO ANITA + TEXT) -->
+    <div id="page4" class="hidden">
+        <div class="page-wrapper">
+            <div class="ig-frame">
+                <img src="anita.jpeg" alt="Foto Anita">
+            </div>
+            <div class="page-text">
+                <h2 class="typing">HAPPY BIRTHDAY ANITA NOVITASARI!🎀</h2>
+                <div class="typing" id="lastMsg"></div>
+            </div>
+        </div>
+        <button onclick="toPage5()">Lanjut ➜</button>
+    </div>
+
+    <!-- PAGE 5 (FOTO KEDUA + TEXT) -->
+    <div id="page5" class="hidden">
+        <div class="page-wrapper">
+            <div class="ig-frame">
+                <img src="kita.jpeg" alt="Foto Kita">
+            </div>
+            <div class="page-text">
+                <h2 class="typing">For You, My bestie and my sister🎀</h2>
+                <div class="typing" id="extraMsg"></div>
+            </div>
+        </div>
+        <button onclick="toPage6()">Lanjut ➜</button>
+    </div>
+
+    <!-- PAGE 6 (FINISH) -->
+    <div id="page6" class="hidden">
+        <h1 class="typing">✨ FINISH ✨</h1>
+        <p class="typing" id="thanksMsg"></p>
+    </div>
+
+</div>
+
+<script>
+function typeWriter(element, text, speed = 45, callback = null) {
+    let i = 0;
+    element.textContent = "";
+    let interval = setInterval(() => {
+        element.textContent += text.charAt(i);
+        i++;
+        if (i >= text.length) {
+            clearInterval(interval);
+            if (callback) callback();
+        }
+    }, speed);
+}
+
+function launchConfetti() {
+    const colors = ["#ff9ad1", "#ffb3dd", "#ff77c6", "#ff66bb"];
+    for (let i = 0; i < 50; i++) {
+        let confetti = document.createElement("div");
+        confetti.classList.add("confetti");
+        confetti.style.left = Math.random() * 100 + "vw";
+        confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        confetti.style.animationDuration = 3 + Math.random() * 2 + "s";
+        document.body.appendChild(confetti);
+        setTimeout(() => confetti.remove(), 5000);
+    }
+}
+
+function toPage2() {
+    page1.classList.add("hidden");
+    page2.classList.remove("hidden");
+}
+
+/* COUNTDOWN */
+function startCountdown() {
+    page2.classList.add("hidden");
+    countdownPage.classList.remove("hidden");
+
+    let count = 3;
+    countdownBox.textContent = count;
+
+    let timer = setInterval(() => {
+        count--;
+        countdownBox.textContent = count;
+
+        if (count <= 0) {
+            clearInterval(timer);
+            toPage3();
+        }
+    }, 1000);
+}
+
+function toPage3() {
+    countdownPage.classList.add("hidden");
+    page3.classList.remove("hidden");
+
+    launchConfetti();
+    music.volume = 0.4;
+    music.play();
+
+    let wishText = 
+`Ini hari spesialmu! Mari kita rayakan. 🎂💗✨
+baca bismillah dulu ya sist♡`;
+
+    typeWriter(wish, wishText, 40);
+}
+
+function toPage4() {
+    page3.classList.add("hidden");
+    page4.classList.remove("hidden");
+    launchConfetti();
+
+    let msg =
+`Selamat ulang tahun ke-20. 🎂✨ Ini chapter yang beneran baru, di mana semua tantangan pasti level up,
+usia yang penuh dengan peluang, tantangan, dan tanggung jawab yang semakin nyata. Semoga kamu panjang umur,
+sehat selalu, dan rezekinya lancar terus.
+
+Wow tidak terasa ya, sudah beneran kepala dua? Rasanya baru kemarin kita sok sibuk ngerjain tugas hahahaa.
+Aku harap di tahun ini, kamu selalu dikaruniai keberanian untuk memilih jalan yang membuatmu paling bahagia, 
+meskipun jalannya tidak selalu mudah. Semoga kamu punya kekuatan untuk tetap berjalan tegak.
+Semoga di setiap langkahmu, kamu selalu dikelilingi orang-orang yang tulus dan suportif. 
+Semoga kamu ketemu orang-orang yang nggak cuma numpang lewat,
+tapi yang benar-benar ada dan menghargai semua effort dan kebaikanmu.
+
+Semoga vibes di sekitarmu selalu positif dan sehat aamiin.
+Kamu pantas mendapatkan semua kebahagiaan dan kesuksesan yang sudah kamu kerjakan. 
+Jangan pernah kecil hati atau lupa betapa berharganya dirimu.
+Wishing you the happiest year ahead. ❤️💫 Love you, always.
+
+Happy birthday sister! 🎀`;
+
+    typeWriter(lastMsg, msg, 40);
+}
+
+function toPage5() {
+    page4.classList.add("hidden");
+    page5.classList.remove("hidden");
+    launchConfetti();
+
+    let msg2 =
+`Foto ini, zaman SMK beneran polos tanpa lipstik!🤣♡
+si anti lipstik, anti dandan, anti ribet, tapi tapi tapi 
+setelah lulus malah jadi kebalikan wajib bedandan (puber maksimal🤣)
+Siapa sangka, berawal dari ajakan pulang bareng karena lihat kamu jalan kaki sambil bawa buku paket segede gaban
+dan kebetulan rumah searah—persahabatan ini bisa sejauh ini.
+
+Aku nggak nyangka bisa berteman sedekat ini. Dulu, kamu itu super jutek, so jual mahal, dan introvert banget. 
+Aku (si semi-extrovert yang agak aneh ini) cuma desperate cari teman biar nggak dibuli,
+dan targetku jatuh ke kamu. Selfish motive banget, ya? (sorry) 😅
+
+Aku nggak pernah sangka, dari semua orang, partner terbaikku justru kamu: 
+si jutek, introvert, dan so jual mahal itu.tapi ternyata aku malah dapat sosok penyelamat dan penyemangat yang paling gigih
+
+Kamu yang tahu banget aku si pemarah dan menerima semua tingkah anehku tanpa menghakimi. 
+Ya, kerjaan kita memang tiap hari ribut nggak jelas,kita itu definisi sahabat yang chaos tapi tulus. 
+Aku memang gengsi setengah mati buat minta maaf, tapi thanks karena kamu yang selalu ngalah dan mengusahakan aku duluan (kadang guweh duluan juga). 
+Itu yang paling aku hargai.
+
+Satu hal paling berkesan: Kamu nggak cuma jadi sahabat. 
+Di kamu, aku nemuin sosok kakak perempuan yang selalu aku inginkan (ya karena aku seorang kakak yang ingin punya kakak).
+Kamu yang pertama kali kasih tahu aku rasanya punya real circle, memaksaku keluar dari zona ngumpet,
+dan mencoba semua kegiatan seru yang belum aku pernah coba bahkan tidak pernah.
+
+Anita Novitasari adalah bukti ter real bahwa bagian lain di hidupku itu ada warnanya.
+Terima kasih sudah jadi penguat dan penasihat terbaik di tengah semua kegilaan ini.
+
+Thank youuu, panjang umur sehat selalu, doa terbaik untukmu selalu✨
+HAPPY BIRTHDAY MY BESTIE, MY SISTER, MY PARTNER 🎂💗✨!
+Tetap jadi Anita yang manis dan kuat yaa✨`;
+
+    typeWriter(extraMsg, msg2, 40);
+}
+
+function toPage6() {
+    page5.classList.add("hidden");
+    page6.classList.remove("hidden");
+    launchConfetti();
+
+    let finalText =
+`Terima kasih sudah melihat surprise ini 💗
+
+Semoga kamu suka dan semoga hari kamu
+lebih bahagia dan menyenangkan dari sebelumnya.
+
+You're special, Anita. Always. 🎀`;
+
+    typeWriter(thanksMsg, finalText, 40);
+}
+</script>
+
+</body>
+</html>
